@@ -74,7 +74,7 @@ function Login({ onLogin }) {
 
       {/* Right Side – Image */}
       <div className="image-side d-none d-md-block">
-        <img src="/images/library-bg.jpg" alt="Library" className="img-fluid" />
+<img src={`${process.env.PUBLIC_URL}/images/library-bg.jpg`} alt="Library" className="img-fluid" />
       </div>
     </div>
   );
