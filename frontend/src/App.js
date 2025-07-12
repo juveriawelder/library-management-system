@@ -6,6 +6,8 @@ import Register from './pages/Register';
 import MyBorrowedBooks from './pages/MyBorrowedBooks';
 import AdminRequests from './pages/AdminRequests';
 import RequestHistory from './pages/RequestHistory';
+import { BrowserRouter } from "react-router-dom";
+
 
 
 function App() {
@@ -42,6 +44,10 @@ function App() {
     </a>
   </div>
 )}
+<BrowserRouter basename="/library-management-system">
+  {/* Your routes */}
+</BrowserRouter>
+
         <Routes>
           <Route
             path="/"
