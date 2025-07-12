@@ -1,0 +1,29 @@
+.login-page {
+  height: 100vh;
+  background-color: #f0f4f8;
+}
+
+.form-side {
+  flex: 1;
+  max-width: 500px;
+  margin: auto;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+.image-side {
+  flex: 1;
+  background: #ddd;
+  overflow: hidden;
+}
+
+.image-side img {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+.link {
+  cursor: pointer;
+  font-weight: 500;
+}

@@ -1,0 +1,30 @@
+.register-page {
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.form-side {
+  flex: 1;
+  max-width: 500px;
+  margin: auto;
+  background-color: #ffffff;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+.image-side {
+  flex: 1;
+  background-color: #ddd;
+  overflow: hidden;
+}
+
+.image-side img {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+}
+
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+}
