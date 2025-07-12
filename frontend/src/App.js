@@ -5,7 +5,7 @@ import Register from './pages/Register';
 import MyBorrowedBooks from './pages/MyBorrowedBooks';
 import AdminRequests from './pages/AdminRequests';
 import RequestHistory from './pages/RequestHistory';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 
 
@@ -28,7 +28,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter basename="/library-management-system">
+    <Router>
       <div className="container mt-3">
         {isLoggedIn && (
           <div className="d-flex justify-content-between mb-3">
@@ -71,7 +71,7 @@ function App() {
 
         </Routes>
       </div>
-    </BrowserRouter>
+    </Router>
   );
 }
 
