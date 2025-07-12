@@ -5,7 +5,7 @@ import Register from './pages/Register';
 import MyBorrowedBooks from './pages/MyBorrowedBooks';
 import AdminRequests from './pages/AdminRequests';
 import RequestHistory from './pages/RequestHistory';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 
 
@@ -28,7 +28,8 @@ function App() {
   };
 
   return (
-    <Router basename="/library-management-system">
+
+<BrowserRouter basename={process.env.PUBLIC_URL}>
 
       <div className="container mt-3">
         {isLoggedIn && (
@@ -72,7 +73,7 @@ function App() {
 
         </Routes>
       </div>
-    </Router>
+</BrowserRouter>
   );
 }
 
