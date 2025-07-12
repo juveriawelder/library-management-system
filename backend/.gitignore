@@ -1,0 +1,19 @@
+# Ignore Visual Studio & build stuff
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+# Ignore build output
+bin/
+obj/
+
+# Ignore published files
+publish/
+wwwroot/
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
