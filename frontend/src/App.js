@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import BookList from './pages/BookList';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyBorrowedBooks from './pages/MyBorrowedBooks';
 import AdminRequests from './pages/AdminRequests';
 import RequestHistory from './pages/RequestHistory';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 
 
@@ -29,7 +28,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <BrowserRouter basename="/library-management-system">
       <div className="container mt-3">
         {isLoggedIn && (
           <div className="d-flex justify-content-between mb-3">
@@ -44,9 +43,6 @@ function App() {
     </a>
   </div>
 )}
-<BrowserRouter basename="/library-management-system">
-  {/* Your routes */}
-</BrowserRouter>
 
         <Routes>
           <Route
@@ -75,7 +71,7 @@ function App() {
 
         </Routes>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 
