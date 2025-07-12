@@ -28,7 +28,8 @@ function App() {
   };
 
   return (
-    <Router>
+    <Router basename="/library-management-system">
+
       <div className="container mt-3">
         {isLoggedIn && (
           <div className="d-flex justify-content-between mb-3">
