@@ -6,7 +6,8 @@ import MyBorrowedBooks from './pages/MyBorrowedBooks';
 import AdminRequests from './pages/AdminRequests';
 import RequestHistory from './pages/RequestHistory';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 function App() {
@@ -40,13 +41,12 @@ function App() {
         )}
           {isLoggedIn && role === 'Admin' && (
   <div className="mb-3">
-    <a href="/admin/requests" className="btn btn-outline-primary">
-      📥 View Book Requests
-    </a>
+<Link to="/admin/requests" className="btn btn-outline-primary">📥 View Book Requests</Link>
+    
   </div>
 )}
 
-        <Routes>
+      <Routes>
           <Route
             path="/"
             element={isLoggedIn ? <BookList role={role} /> : <Navigate to="/login" />}
@@ -63,13 +63,16 @@ function App() {
             path="/mybooks"
             element={isLoggedIn && role === 'Member' ? <MyBorrowedBooks /> : <Navigate to="/login" />}
           />
+          <Route
+            path="/request-history"
+            element={isLoggedIn && role === 'Member' ? <RequestHistory /> : <Navigate to="/login" />}
+          />
+          <Route path="/admin/requests" element={<AdminRequests />} />
 <Route
-  path="/request-history"
-  element={isLoggedIn && role === 'Member' ? <RequestHistory /> : <Navigate to="/login" />}
+  path="/admin/dashboard"
+  element={isLoggedIn && role === 'Admin' ? <AdminDashboard /> : <Navigate to="/" />}
 />
 
-
-        <Route path="/admin/requests" element={<AdminRequests />} />
 
         </Routes>
       </div>
