@@ -13,7 +13,10 @@ export const requestBook = (bookId, username) =>
   axios.post(`${API_BASE}/Issue/request`, { bookId, username });
 
 export const returnBook = (bookId, username) =>
-  axios.post(`${API_BASE}/Issue/return`, { bookId, username });
+  axios.post(`${API_BASE}/BookRequests/return`, {
+    BookId: bookId,
+    Username: username
+  });
 
 export const getMyIssuedBooks = (username) =>
   axios.get(`${API_BASE}/Issue/mybooks?username=${username}`);

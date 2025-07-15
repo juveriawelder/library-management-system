@@ -24,17 +24,18 @@ import {
   LinearScale,
   BarElement
 } from 'chart.js';
+import { useLocation } from 'react-router-dom';
+import { useRef } from 'react'; // 👈 New
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 function BookList() {
   const role = localStorage.getItem('role');
   const username = localStorage.getItem('username');
-
   const [books, setBooks] = useState([]);
   const [issuedBooks, setIssuedBooks] = useState([]);
   const [issuedBookIds, setIssuedBookIds] = useState([]);
-  const [myRequests, setMyRequests] = useState([]);
   const [requestStatuses, setRequestStatuses] = useState({});
   const [search, setSearch] = useState('');
   const [formData, setFormData] = useState({
@@ -48,12 +49,18 @@ function BookList() {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [message, setMessage] = useState('');
-
   const [totalIssued, setTotalIssued] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
   const [activeUsers, setActiveUsers] = useState(0);
   const [requestChartData, setRequestChartData] = useState(undefined);
   const [issuedBooksChartData, setIssuedBooksChartData] = useState(undefined);
+  const bookTableRef = useRef(null);
+  const location = useLocation();
+  
+const navigate = useNavigate();
+const goToBooksTable = () => navigate('/#book-table'); // 👈 will scroll to ID
+const goToRequests = () => navigate('/admin/requests');
+const goToUsers = () => navigate('/admin/users');
 
   const fetchBooks = useCallback(() => {
     getBooks()
@@ -87,6 +94,11 @@ function BookList() {
 
   useEffect(() => {
     fetchBooks();
+      if (location.hash === '#book-table' && bookTableRef.current) {
+    // Smooth scroll into view
+    bookTableRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
+
     if (role === 'Member') {
       fetchIssuedBooks();
       fetchMyRequests();
@@ -94,26 +106,56 @@ function BookList() {
     if (role === 'Admin') {
       getAllBookRequests().then(res => {
         const data = res.data || [];
-        const approved = data.filter(r => r.status === 'Approved').length;
-        const pending = data.filter(r => r.status === 'Pending').length;
+
+console.log('---Book Requests---');
+console.table(data.map(r => ({ bookTitle: r.bookTitle, status: r.status, returnDate: r.returnDate })));
+
+console.log('--- Full Book Requests ---');
+res.data.forEach(r => {
+  if (r.status === 'Approved') {
+    console.log(`Book: ${r.bookTitle}, ReturnDate: ${r.returnDate}`);
+  }
+});
+
+const approvedNotReturned = data.filter(r => {
+  if (r.status !== 'Approved') return false;
+
+  if (!r.returnDate || r.returnDate === "0001-01-01T00:00:00") return true;
+
+  const parsedDate = new Date(r.returnDate);
+  return isNaN(parsedDate.getTime()); // Invalid = still not returned
+}).length;
+
+console.log('Approved (Not Returned) Count:', approvedNotReturned);
+
+
+
+
+       const pending = data.filter(r => r.status === 'Pending').length;
         const rejected = data.filter(r => r.status === 'Rejected').length;
 
-        setTotalIssued(approved);
+        setTotalIssued(approvedNotReturned);
         setPendingRequests(pending);
 
         setRequestChartData({
-          labels: ['Approved', 'Pending', 'Rejected'],
+          labels: ['Borrowed (Not Returned)', 'Pending', 'Rejected'],
           datasets: [{
-            data: [approved, pending, rejected],
+            data: [approvedNotReturned, pending, rejected],
             backgroundColor: ['#198754', '#ffc107', '#dc3545']
           }]
         });
+console.log('Approved Requests:', data.filter(r => r.status === 'Approved'));
+console.log('Approved Not Returned:', approvedNotReturned);
 
         const grouped = {};
         data.forEach(r => {
-          if (r.status === 'Approved') {
-            grouped[r.bookTitle] = (grouped[r.bookTitle] || 0) + 1;
-          }
+       if (
+  r.status === 'Approved' &&
+  (r.returnDate === undefined || r.returnDate === null || r.returnDate === "" || r.returnDate === "0001-01-01T00:00:00")
+) {
+  grouped[r.bookTitle] = (grouped[r.bookTitle] || 0) + 1;
+}
+
         });
 
         setIssuedBooksChartData({
@@ -128,7 +170,8 @@ function BookList() {
 
       getAllUsers().then(res => setActiveUsers(res.data.length));
     }
-  }, [role, fetchBooks, fetchIssuedBooks, fetchMyRequests]);
+  }, [role, fetchBooks, fetchIssuedBooks, fetchMyRequests,location]);
+
 
   const uploadImage = async () => {
     if (!selectedImage) return '';
@@ -174,16 +217,27 @@ function BookList() {
       .catch(() => setMessage('Delete failed.'));
   };
 
+  // const handleRequestSubmit = async (bookId, bookTitle) => {
+  //   try {
+  //     await axios.post('https://localhost:7205/api/BookRequests', { bookId, bookTitle, username });
+  //     setRequestStatuses(prev => ({ ...prev, [bookId]: 'Pending' }));
+  //     await fetchMyRequests();
+  //     setMessage('Request submitted for approval!');
+  //   } catch {
+  //     setMessage('Failed to submit request.');
+  //   }
+  // };
+
   const handleRequestSubmit = async (bookId, bookTitle) => {
-    try {
-      await axios.post('https://localhost:7205/api/BookRequests', { bookId, bookTitle, username });
-      setRequestStatuses(prev => ({ ...prev, [bookId]: 'Pending' }));
-      await fetchMyRequests();
-      setMessage('Request submitted for approval!');
-    } catch {
-      setMessage('Failed to submit request.');
-    }
-  };
+  try {
+    await axios.post('https://localhost:7205/api/BookRequests', { bookId, bookTitle, username });
+    setRequestStatuses(prev => ({ ...prev, [bookId]: 'Pending' })); // Immediately update UI
+    setMessage('Request submitted for approval!');
+  } catch {
+    setMessage('Failed to submit request.');
+  }
+};
+
 
   const handleReturn = (bookId) => {
     returnBook(bookId, username)
@@ -197,7 +251,11 @@ function BookList() {
         });
         setMessage('Book returned successfully!');
       })
-      .catch(() => setMessage('Return failed.'));
+    .catch((err) => {
+  console.error('Return failed:', err.response?.data || err.message);
+  setMessage(`Return failed: ${err.response?.data || err.message}`);
+});
+
   };
 
   const filteredBooks = books.filter(b =>
@@ -205,21 +263,34 @@ function BookList() {
     b.author.toLowerCase().includes(search.toLowerCase())
   );
 
-  const getRequestStatus = (bookId) => requestStatuses[bookId] || null;
-  // Return part updated to conditionally render charts
+const getRequestStatus = (bookId) => requestStatuses[bookId] || null;
+
 
   return (
+<>
+  {/* 👋 Greeting only when logged in */}
+
+ {localStorage.getItem("username") && (
+  <div className="py-3 text-center">
+    <h3 className="fw-semibold">
+      👋 Hello, <span className="text-primary">{localStorage.getItem("username")}</span>! Welcome back.
+    </h3>
+  </div>
+)}
+
+    
     <div className="container mt-5">
+
       <h2 className="mb-4">📚 Library Management</h2>
       {message && <div className="alert alert-info">{message}</div>}
 
      {role === 'Admin' && (
         <>
           <div className="row mb-4 text-white">
-            <div className="col-md-3"><div className="bg-primary p-3 rounded">📚 Total Books: <strong>{books.length}</strong></div></div>
-            <div className="col-md-3"><div className="bg-success p-3 rounded">✅ Books Issued: <strong>{totalIssued}</strong></div></div>
-            <div className="col-md-3"><div className="bg-warning p-3 rounded">⏳ Pending Requests: <strong>{pendingRequests}</strong></div></div>
-            <div className="col-md-3"><div className="bg-dark p-3 rounded">👤 Active Users: <strong>{activeUsers}</strong></div></div>
+            <div className="col-md-3"><div className="bg-primary p-3 rounded" onClick={goToBooksTable} style={{ cursor: 'pointer' }}>📚 Total Books: <strong>{books.length}</strong></div></div>
+            <div className="col-md-3"><div className="bg-success p-3 rounded"onClick={goToRequests} style={{ cursor: 'pointer' }}>✅ Books Issued: <strong>{totalIssued}</strong></div></div>
+            <div className="col-md-3"><div className="bg-warning p-3 rounded" onClick={goToRequests} style={{ cursor: 'pointer' }}>⏳ Pending Requests: <strong>{pendingRequests}</strong></div></div>
+            <div className="col-md-3"><div className="bg-dark p-3 rounded"onClick={goToUsers} style={{ cursor: 'pointer' }}>👤 Active Users: <strong>{activeUsers}</strong></div></div>
           </div>
 
           <div className="row mb-5">
@@ -247,6 +318,7 @@ function BookList() {
               </div>
             </div>
           </form>
+         <div id="book-table" ref={bookTableRef}>
 
           <table className="table table-bordered table-hover">
             <thead className="table-dark">
@@ -277,6 +349,7 @@ function BookList() {
               )}
             </tbody>
           </table>
+          </div>
         </>
       )}
 
@@ -290,7 +363,6 @@ function BookList() {
 
           <div className="row row-cols-1 row-cols-md-3 g-4">
             {filteredBooks.map(book => {
-              const isIssued = issuedBookIds.includes(book.id);
               const requestStatus = getRequestStatus(book.id);
 
               return (
@@ -300,11 +372,40 @@ function BookList() {
                     <div className="card-body">
                       <h5 className="card-title">{book.title}</h5>
                       <p className="card-text text-muted">by {book.author}</p>
-                      <p className="card-text">📦 Available: {book.quantity}</p>
+                     <p className="card-text">📦 Available: {book.quantity}</p>
 
-                      {isIssued ? (
-                        <button className="btn btn-danger w-100" onClick={() => handleReturn(book.id)}>Return</button>
-                      ) : requestStatus === 'Pending' ? (
+{issuedBookIds.includes(book.id) ? (() => {
+  const issuedBook = issuedBooks.find(b => b.bookId === book.id);
+  let dueText = '';
+  let dueClass = '';
+
+  if (issuedBook && issuedBook.issueDate) {
+    const issueDate = new Date(issuedBook.issueDate);
+    const dueDate = new Date(issueDate);
+    dueDate.setDate(dueDate.getDate() + 7);
+    const today = new Date();
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays >= 0) {
+      dueText = `Due in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+      dueClass = diffDays <= 2 ? 'badge bg-warning text-dark' : 'badge bg-success';
+    } else {
+      dueText = 'Overdue';
+      dueClass = 'badge bg-danger';
+    }
+  }
+
+  return (
+    <>
+      <p className="card-text">
+        📅 <span className={dueClass}>{dueText}</span>
+      </p>
+      <button className="btn btn-danger w-100" onClick={() => handleReturn(book.id)}>Return</button>
+    </>
+  );
+})() : requestStatus === 'Pending' ? (
+
                         <button className="btn btn-secondary w-100" disabled>Requested</button>
                       ) : (
                         <button
@@ -323,6 +424,7 @@ function BookList() {
         </>
       )}
     </div>
+    </>
   );
 }
 

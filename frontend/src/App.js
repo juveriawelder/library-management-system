@@ -6,8 +6,9 @@ import MyBorrowedBooks from './pages/MyBorrowedBooks';
 import AdminRequests from './pages/AdminRequests';
 import RequestHistory from './pages/RequestHistory';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import AdminDashboard from './pages/AdminDashboard';
+// import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
@@ -29,22 +30,44 @@ function App() {
   };
 
   return (
-
 <BrowserRouter basename={process.env.PUBLIC_URL}>
+<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div className="container-fluid">
+    <span className="navbar-brand fw-bold">📚 Library Management System</span>
 
-      <div className="container mt-3">
+    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span className="navbar-toggler-icon"></span>
+    </button>
+
+    <div className="collapse navbar-collapse justify-content-end" id="navbarContent">
+      {isLoggedIn && (
+        <ul className="navbar-nav mb-2 mb-lg-0 align-items-center">
+          <li className="nav-item me-3">
+            <span className="nav-link">📛 Role: {role}</span>
+          </li>
+          <li className="nav-item">
+            <button className="btn btn-outline-danger" onClick={handleLogout}>Logout</button>
+          </li>
+        </ul>
+      )}
+    </div>
+  </div>
+</nav>
+
+
+      {/* <div className="container mt-3">
         {isLoggedIn && (
           <div className="d-flex justify-content-between mb-3">
             <h5>📛 Role: {role}</h5>
             <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
           </div>
-        )}
-          {isLoggedIn && role === 'Admin' && (
+        )} */}
+          {/* {isLoggedIn && role === 'Admin' && (
   <div className="mb-3">
 <Link to="/admin/requests" className="btn btn-outline-primary">📥 View Book Requests</Link>
     
   </div>
-)}
+)} */}
 
       <Routes>
           <Route
@@ -68,14 +91,16 @@ function App() {
             element={isLoggedIn && role === 'Member' ? <RequestHistory /> : <Navigate to="/login" />}
           />
           <Route path="/admin/requests" element={<AdminRequests />} />
+          {/* <Route path="/admin/dashboard"
+                  element={isLoggedIn && role === 'Admin' ? <AdminDashboard /> : <Navigate to="/" />}/> */}
 <Route
-  path="/admin/dashboard"
-  element={isLoggedIn && role === 'Admin' ? <AdminDashboard /> : <Navigate to="/" />}
+  path="/admin/users"
+  element={isLoggedIn && role === 'Admin' ? <AdminUsers /> : <Navigate to="/" />}
 />
 
 
         </Routes>
-      </div>
+      
 </BrowserRouter>
   );
 }
