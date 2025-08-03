@@ -8,6 +8,7 @@ import RequestHistory from './pages/RequestHistory';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
+import Navbar from './components/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -31,7 +32,7 @@ function App() {
 
   return (
 <BrowserRouter basename={process.env.PUBLIC_URL}>
-<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+{/* <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
   <div className="container-fluid">
     <span className="navbar-brand fw-bold">📚 Library Management System</span>
 
@@ -52,54 +53,22 @@ function App() {
       )}
     </div>
   </div>
-</nav>
-
-
-      {/* <div className="container mt-3">
-        {isLoggedIn && (
-          <div className="d-flex justify-content-between mb-3">
-            <h5>📛 Role: {role}</h5>
-            <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
-          </div>
-        )} */}
-          {/* {isLoggedIn && role === 'Admin' && (
-  <div className="mb-3">
-<Link to="/admin/requests" className="btn btn-outline-primary">📥 View Book Requests</Link>
-    
-  </div>
-)} */}
-
+</nav> */}
+  <Navbar isLoggedIn={isLoggedIn} role={role} handleLogout={handleLogout} />
       <Routes>
-          <Route
-            path="/"
-            element={isLoggedIn ? <BookList role={role} /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/login"
-            element={<Login onLogin={handleLogin} />}
-          />
-          <Route
-            path="/register"
-            element={<Register />}
-          />
-          <Route
-            path="/mybooks"
-            element={isLoggedIn && role === 'Member' ? <MyBorrowedBooks /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/request-history"
-            element={isLoggedIn && role === 'Member' ? <RequestHistory /> : <Navigate to="/login" />}
-          />
-          <Route path="/admin/requests" element={<AdminRequests />} />
-          {/* <Route path="/admin/dashboard"
-                  element={isLoggedIn && role === 'Admin' ? <AdminDashboard /> : <Navigate to="/" />}/> */}
-<Route
-  path="/admin/users"
-  element={isLoggedIn && role === 'Admin' ? <AdminUsers /> : <Navigate to="/" />}
-/>
+      <Route path="/" element={isLoggedIn ? <BookList role={role} /> : <Navigate to="/login" />}/>
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/my-borrowed" element={<MyBorrowedBooks />} />
+      <Route path="/admin-users" element={<AdminUsers />} />
+      <Route path="/request-history" element={isLoggedIn && role === 'Member' ? <RequestHistory /> : <Navigate to="/login" />}/>
+      <Route path="/mybooks" element={isLoggedIn && role === 'Member' ? <MyBorrowedBooks /> : <Navigate to="/login" />} />
+      <Route path="/admin/requests" element={<AdminRequests />} />
+      {/* <Route path="/admin/dashboard" element={isLoggedIn && role === 'Admin' ? <AdminDashboard /> : <Navigate to="/" />}/>  */}
+      <Route path="/admin/users" element={isLoggedIn && role === 'Admin' ? <AdminUsers /> : <Navigate to="/" />}/> 
+      <Route path="*" element={<Navigate to="/" />} />
 
-
-        </Routes>
+</Routes>
       
 </BrowserRouter>
   );

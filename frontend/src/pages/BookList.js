@@ -28,6 +28,7 @@ import { useLocation } from 'react-router-dom';
 import { useRef } from 'react'; // 👈 New
 import { useNavigate } from 'react-router-dom';
 
+
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 function BookList() {
@@ -78,19 +79,37 @@ const goToUsers = () => navigate('/admin/users');
       .catch(err => console.log(err));
   }, [username]);
 
-  const fetchMyRequests = useCallback(() => {
-    axios
-      .get(`https://localhost:7205/api/BookRequests/user/${username}`)
-      .then(res => {
-        const requests = res.data.map(r => ({ bookId: r.bookId, status: r.status }));
-        const statusMap = {};
-        requests.forEach(r => {
-          statusMap[r.bookId] = r.status;
-        });
-        setRequestStatuses(statusMap);
-      })
-      .catch(err => console.log(err));
-  }, [username]);
+  // const fetchMyRequests = useCallback(() => {
+  //   axios
+  //     .get(`https://localhost:7205/api/BookRequests/user/${username}`)
+  //     .then(res => {
+  //       const requests = res.data.map(r => ({ bookId: r.bookId, status: r.status }));
+  //       const statusMap = {};
+  //       requests.forEach(r => {
+  //         statusMap[r.bookId] = r.status;
+  //       });
+  //       setRequestStatuses(statusMap);
+  //     })
+  //     .catch(err => console.log(err));
+  // }, [username]);
+const fetchMyRequests = useCallback(() => {
+  axios
+    .get(`https://localhost:7205/api/BookRequests/user/${username}`)
+    .then(res => {
+      const statusMap = {};
+      res.data.forEach(r => {
+        const isApprovedButNotReturned =
+          r.status === 'Approved' &&
+          (!r.returnDate || r.returnDate === "0001-01-01T00:00:00");
+
+        if (r.status === 'Pending' || isApprovedButNotReturned) {
+          statusMap[r.bookId] = r.status; // ✅ Only mark as requested
+        }
+      });
+      setRequestStatuses(statusMap);
+    })
+    .catch(err => console.log(err));
+}, [username]);
 
   useEffect(() => {
     fetchBooks();
