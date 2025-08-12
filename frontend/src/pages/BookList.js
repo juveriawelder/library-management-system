@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { imageUrl } from '../services/BookService';
 import {
   getBooks,
   addBook,
@@ -94,7 +95,8 @@ const goToUsers = () => navigate('/admin/users');
   // }, [username]);
 const fetchMyRequests = useCallback(() => {
   axios
-    .get(`https://localhost:7205/api/BookRequests/user/${username}`)
+   // .get(`https://localhost:7205/api/BookRequests/user/${username}`)
+    api.get(`/api/BookRequests/user/${username}`)
     .then(res => {
       const statusMap = {};
       res.data.forEach(r => {
@@ -196,7 +198,8 @@ console.log('Approved Not Returned:', approvedNotReturned);
     if (!selectedImage) return '';
     const formData = new FormData();
     formData.append('file', selectedImage);
-    const response = await axios.post('https://localhost:7205/api/Books/upload', formData);
+    //const response = await axios.post('https://localhost:7205/api/Books/upload', formData);
+     const response = await api.post('/api/Books/upload', formData)
     return response.data.fileName;
   };
 
@@ -249,7 +252,8 @@ console.log('Approved Not Returned:', approvedNotReturned);
 
   const handleRequestSubmit = async (bookId, bookTitle) => {
   try {
-    await axios.post('https://localhost:7205/api/BookRequests', { bookId, bookTitle, username });
+    //await axios.post('https://localhost:7205/api/BookRequests', { bookId, bookTitle, username });
+    await api.post('api/BookRequests', { bookId, bookTitle, username });
     setRequestStatuses(prev => ({ ...prev, [bookId]: 'Pending' })); // Immediately update UI
     setMessage('Request submitted for approval!');
   } catch {
@@ -353,7 +357,8 @@ const getRequestStatus = (bookId) => requestStatuses[bookId] || null;
             <tbody>
               {filteredBooks.length > 0 ? filteredBooks.map(book => (
                 <tr key={book.id}>
-                  <td><img src={`https://localhost:7205/Images/Books/${book.imageName}`} alt={book.title} style={{ width: '50px', height: '70px', objectFit: 'cover' }} /></td>
+                  {/* <td><img src={`https://localhost:7205/Images/Books/${book.imageName}`} alt={book.title} style={{ width: '50px', height: '70px', objectFit: 'cover' }} /></td> */}
+                  <td><img src={imageUrl(book.imageName)}  alt={book.title} style={{ width: '50px', height: '70px', objectFit: 'cover' }} /></td>
                   <td>{book.title}</td>
                   <td>{book.author}</td>
                   <td>{book.category}</td>
@@ -387,7 +392,8 @@ const getRequestStatus = (bookId) => requestStatuses[bookId] || null;
               return (
                 <div key={book.id} className="col">
                   <div className="card h-100 shadow-sm">
-                    <img src={`https://localhost:7205/Images/Books/${book.imageName}`} alt={book.title} className="card-img-top" style={{ height: '300px', objectFit: 'cover' }} />
+                    {/* <img src={`https://localhost:7205/Images/Books/${book.imageName}`} alt={book.title} className="card-img-top" style={{ height: '300px', objectFit: 'cover' }} /> */}
+                    <td><img src={imageUrl(book.imageName)}  alt={book.title} className="card-img-top" style={{ height: '300px', objectFit: 'cover' }} /></td>
                     <div className="card-body">
                       <h5 className="card-title">{book.title}</h5>
                       <p className="card-text text-muted">by {book.author}</p>

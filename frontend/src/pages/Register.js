@@ -19,7 +19,8 @@ function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('https://localhost:7205/api/Auth/register', formData)
+    //axios.post('https://localhost:7205/api/Auth/register', formData)
+    api.post('/api/Auth/register', formData)
       .then(() => {
         setMessage('Registration successful. Redirecting to login...');
         setTimeout(() => navigate('/login'), 2000);

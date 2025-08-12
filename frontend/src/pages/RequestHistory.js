@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import api from '../services/api';
 
 
 function RequestHistory() {
@@ -9,7 +10,9 @@ function RequestHistory() {
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    axios.get(`https://localhost:7205/api/BookRequests/user/${username}`)
+   // axios.get(`https://localhost:7205/api/BookRequests/user/${username}`)- axios.get(`https://localhost:7205/api/BookRequests/user/${username}`)
+    api.get(`/api/BookRequests/user/${username}`)
+
       .then(res => setRequests(res.data))
       .catch(err => console.error('Failed to load history', err));
   }, [username]);

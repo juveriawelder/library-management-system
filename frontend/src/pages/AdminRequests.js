@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllBookRequests, updateBookRequestStatus } from '../services/BookService';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import api from './api';
 
 
 function AdminRequests() {
@@ -25,7 +26,8 @@ function AdminRequests() {
 const handleDelete = async (id) => {
   if (window.confirm("Are you sure you want to delete this request?")) {
     try {
-      await axios.delete(`https://localhost:7205/api/BookRequests/${id}`);
+      // await axios.delete(`https://localhost:7205/api/BookRequests/${id}`);
+     await api.delete(`/api/BookRequests/${id}`)
       console.log("Deleting request with ID:", id);
 // Refresh request list after deletion
       fetchRequests(); // or manually remove from state
@@ -39,7 +41,8 @@ const handleDelete = async (id) => {
 const handleClearRejected = async () => {
   if (window.confirm("Are you sure you want to delete all rejected requests?")) {
     try {
-      await axios.delete('https://localhost:7205/api/BookRequests/clear-rejected');
+      // await axios.delete('https://localhost:7205/api/BookRequests/clear-rejected');
+     await api.delete('/api/BookRequests/clear-rejected')
       fetchRequests();
       setMessage("All rejected requests cleared.");
     } catch (error) {

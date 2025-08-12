@@ -16,10 +16,11 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     // ✅ Only send username and password (NO role)
-    axios.post('https://localhost:7205/api/Auth/login', {
-      username: formData.username,
-      password: formData.password
-    })
+    // axios.post('https://localhost:7205/api/Auth/login', {
+    //   username: formData.username,
+    //   password: formData.password
+    // })
+    api.post('/api/Auth/login', { username : formData.username, password :formData.password })
 .then(res => {
   localStorage.setItem('token', res.data.token);
   localStorage.setItem('role', res.data.role);
